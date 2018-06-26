@@ -1,6 +1,8 @@
 import Tkinter as tk
 import tkFont
 import sqlite3
+import csv
+from time import gmtime, strftime
 
 from numericwindow import *
 from totalwindow import *
@@ -98,38 +100,49 @@ class KassaSysteem:
         self.lower_frame.grid_rowconfigure(0, weight=1)
         self.lower_frame.grid_rowconfigure(1, weight=1)
 
-        totaal_label = tk.Button(self.lower_frame, text="Kassa", font=self.myfont, command=self.__button_kassa)
-        totaal_label.grid(row=0, column=2, sticky="nsew", rowspan=2)
+        #totaal_label = tk.Button(self.lower_frame, text="Kassa", font=self.myfont, command=self.__button_kassa)
+        #totaal_label.grid(row=0, column=2, sticky="nsew", rowspan=2)
         self.lower_frame.grid_columnconfigure(0, weight=1)
 
-        clear_button = tk.Button(self.lower_frame, text="Reset", font=self.myfont, command=self.__button_clear)
+        clear_button = tk.Button(self.lower_frame, text="Reset", font=self.myfont, command=self.__button_clear, borderwidth=10)
         clear_button.grid(row=0, column=0, sticky="nsew", rowspan=2)
         self.lower_frame.grid_columnconfigure(1, weight=1)
 
-        ok_button = tk.Button(self.lower_frame, text="OK", font=self.myfont, command=self.__button_ok)
+        ok_button = tk.Button(self.lower_frame, text="OK", font=self.myfont, command=self.__button_ok, borderwidth=10)
         ok_button.grid(row=0, column=1, sticky="nsew", rowspan=2)
         self.lower_frame.grid_columnconfigure(2, weight=1)
 
-        send_button = tk.Button(self.lower_frame, text="Avondtotaal", font=self.myfont, command=self.__button_total)
-        send_button.grid(row=0, column=3, sticky="nsew")
-        self.lower_frame.grid_columnconfigure(3, weight=1)
+        send_button = tk.Button(self.lower_frame, text="Avondtotaal", font=self.myfont, command=self.__button_total, borderwidth=10)
+        send_button.grid(row=0, column=2, sticky="nsew")
+        #self.lower_frame.grid_columnconfigure(3, weight=1)
 
-        total_button = tk.Button(self.lower_frame, text="Send", font=self.myfont, command=self.__button_send)
-        total_button.grid(row=1, column=3, sticky="nsew")
-        self.lower_frame.grid_columnconfigure(3, weight=1)
+        total_button = tk.Button(self.lower_frame, text="Send", font=self.myfont, command=self.__button_send, borderwidth=10)
+        total_button.grid(row=1, column=2, sticky="nsew")
+        #self.lower_frame.grid_columnconfigure(3, weight=1)
+
+    def leeg_database(self):
+        self.cursor.execute('DELETE FROM drinks')
+        self.db.commit()
+
+    def maak_excel(self):
+        self.cursor.execute('SELECT * FROM drinks')
+        timestring = strftime("%Y-%m-%d-%H:%M:%S", gmtime())
+        with open(timestring + ".csv", "wb") as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow([i[0] for i in self.cursor.description])
+            csv_writer.writerows(self.cursor)
 
     def __button_kassa(self):
         starter = KassaVuller(self.rootWindow, self.notecollection)
 
     def __button_total(self):
-        if AvondBedrag(self.rootWindow, 99292).einde:
+        self.cursor.execute('SELECT sum(total) FROM drinks')
+        totaal =  self.cursor.fetchone()[0]
+        if AvondBedrag(self.rootWindow, totaal).einde:
             self.maak_excel()
             self.leeg_database()
         else:
             print "aiaiia"
-
-    def maak_excel(self):
-        pass
 
     def __button_ok(self):
         rekening = 0
@@ -145,7 +158,6 @@ class KassaSysteem:
             eenheidrekening.reset()
         rekening += self.custom_totaal
         insertstring = insertstring[:-1] + "," + str(self.custom_totaal) +"," + str(rekening) + ");"
-        print insertstring
         self.custom_totaal = 0
         self.cursor.execute(insertstring)
         self.db.commit()
@@ -160,7 +172,7 @@ class KassaSysteem:
 
     def __button_mystery(self):
         self.custom_totaal += NumericWindow(self.rootWindow).get_value()
-        pass
+        self.totaalvar.set(self.custom_totaal)
 
     def __button_send(self):
         print self.eindrekening.get_rekening()
@@ -169,15 +181,19 @@ class KassaSysteem:
                 print str(dink.amount) + " " + str(dink.bedrag)
 
     def __add_mystery_knop(self, window):
-        mystery_button = tk.Button(window, text="Custom", font=self.myfont, command=self.__button_mystery)
-        mystery_button.grid(row=0, column=self.eenheid_counter, sticky="nsew", rowspan=2)
+        self.totaalvar = tk.IntVar()
+        mystery_button = tk.Button(window, text="Custom", font=self.myfont, command=self.__button_mystery, borderwidth=10)
+        mystery_button.grid(row=0, column=self.eenheid_counter, sticky="nsew")
         self.eenheden_frame.grid_columnconfigure(self.eenheid_counter, weight=1)
+        mystery_var = tk.Label(window, textvariable=self.totaalvar, font=self.myfont)
+        mystery_var.grid(row=1, column=self.eenheid_counter, sticky="nsew")
+
 
     def __add_eenheden(self, window, eenheid):
         nieuwe_eenheid = self.eenheidBestelling(eenheid)
         self.huidige_rekening[eenheid.bedrag] = nieuwe_eenheid
         eenheid_button = tk.Button(window, text=nieuwe_eenheid.bestelling.bedrag,
-                                   font=self.myfont, command=lambda: nieuwe_eenheid.plus_one())
+                                   font=self.myfont, command=lambda: nieuwe_eenheid.plus_one(), borderwidth=10)
         eenheid_button.grid(row=0, column=self.eenheid_counter, sticky="nsew")
         eenheid_label = tk.Label(window, textvariable=nieuwe_eenheid.tk_amount, font=self.myfont)
         eenheid_label.grid(row=1, column=self.eenheid_counter, sticky="nsew")
