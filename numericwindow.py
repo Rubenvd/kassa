@@ -6,6 +6,8 @@ class NumericWindow:
     def __init__(self, parentwindow):
         self.__window = tk.Toplevel(parentwindow)
         self.__window.attributes('-topmost', 'true')
+        self.__window.attributes('-fullscreen', 'true')
+
         self.__window.title("Numeric input")
         self.__columns = 3
         self.__entrycount = 0

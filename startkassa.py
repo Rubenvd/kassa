@@ -27,6 +27,7 @@ class KassaVuller:
         self.__window = tk.Toplevel(parentwindow)
         self.__window.attributes('-topmost', 'true')
         self.__window.title("KassaVuller")
+        self.__window.attributes("-fullscreen", True)
 
         self.__setup_window_ui(self.__window)
         self.__window.wait_window()
@@ -53,7 +54,7 @@ class KassaVuller:
         label_total.grid(row=self.__entryCount,
                          column=0)
 
-        button_total = tk.Button(window, textvariable=number.var, width=4,
+        button_total = tk.Button(window, textvariable=number.var, width=4, height=2,
                                  command=lambda: number.number_input(self.__window),
                                  font=tkFont.Font(family='Helvetica', size=28, weight=tkFont.BOLD))
         button_total.grid(row=self.__entryCount,
