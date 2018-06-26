@@ -55,7 +55,7 @@ class KassaSysteem:
                 "vedett smallint, wine smallint, bottle smallint, custom smallint, total smallint);"
             )
         except:
-            print "jajaja"
+            pass
 
     def setup_user_interface(self):
         self.rootWindow = tk.Tk()
@@ -102,23 +102,22 @@ class KassaSysteem:
 
         #totaal_label = tk.Button(self.lower_frame, text="Kassa", font=self.myfont, command=self.__button_kassa)
         #totaal_label.grid(row=0, column=2, sticky="nsew", rowspan=2)
-        self.lower_frame.grid_columnconfigure(0, weight=1)
+
 
         clear_button = tk.Button(self.lower_frame, text="Reset", font=self.myfont, command=self.__button_clear, borderwidth=10)
         clear_button.grid(row=0, column=0, sticky="nsew", rowspan=2)
-        self.lower_frame.grid_columnconfigure(1, weight=1)
+        self.lower_frame.grid_columnconfigure(0, weight=1)
+
 
         ok_button = tk.Button(self.lower_frame, text="OK", font=self.myfont, command=self.__button_ok, borderwidth=10)
         ok_button.grid(row=0, column=1, sticky="nsew", rowspan=2)
-        self.lower_frame.grid_columnconfigure(2, weight=1)
+        self.lower_frame.grid_columnconfigure(1, weight=1)
 
         send_button = tk.Button(self.lower_frame, text="Avondtotaal", font=self.myfont, command=self.__button_total, borderwidth=10)
         send_button.grid(row=0, column=2, sticky="nsew")
-        #self.lower_frame.grid_columnconfigure(3, weight=1)
-
         total_button = tk.Button(self.lower_frame, text="Send", font=self.myfont, command=self.__button_send, borderwidth=10)
         total_button.grid(row=1, column=2, sticky="nsew")
-        #self.lower_frame.grid_columnconfigure(3, weight=1)
+        self.lower_frame.grid_columnconfigure(2, weight=1)
 
     def leeg_database(self):
         self.cursor.execute('DELETE FROM drinks')
@@ -142,7 +141,7 @@ class KassaSysteem:
             self.maak_excel()
             self.leeg_database()
         else:
-            print "aiaiia"
+            pass
 
     def __button_ok(self):
         rekening = 0
@@ -159,6 +158,7 @@ class KassaSysteem:
         rekening += self.custom_totaal
         insertstring = insertstring[:-1] + "," + str(self.custom_totaal) +"," + str(rekening) + ");"
         self.custom_totaal = 0
+        self.totaalvar.set(0)
         self.cursor.execute(insertstring)
         self.db.commit()
 
@@ -169,6 +169,8 @@ class KassaSysteem:
     def __button_clear(self):
         for key in self.huidige_rekening.keys():
             self.huidige_rekening[key].reset()
+        self.custom_totaal = 0
+        self.totaalvar.set(0)
 
     def __button_mystery(self):
         self.custom_totaal += NumericWindow(self.rootWindow).get_value()
