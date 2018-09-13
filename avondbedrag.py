@@ -14,7 +14,7 @@ class AvondBedrag:
                         width=40, height=10, font=self.myfont, anchor="center")
         numberlabel.grid(row=0, column=0, sticky="nsew", columnspan=2)
 
-        button_ok = tk.Button(self.__window, text="OK", command=self.__okay, anchor="center",height=4,
+        button_ok = tk.Button(self.__window, text="Terug", command=self.__okay, anchor="center",height=4,
                               font=tkFont.Font(family='Helvetica', size=28, weight=tkFont.BOLD))
 
         button_ok.grid(row=1, column=0, sticky="nsew")

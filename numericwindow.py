@@ -36,7 +36,7 @@ class NumericWindow:
         self.__add_button(self.__create_number(self.__window, 9))
         self.__add_button(self.__create_number(self.__window, 0))
 
-        button_clear = tk.Button(window, text="CLEAR", command= self.__reset,
+        button_clear = tk.Button(window, text="RESET", command= self.__reset,
                                  font=tkFont.Font(family='Helvetica', size=18, weight=tkFont.BOLD))
         self.__add_button(button_clear)
 
